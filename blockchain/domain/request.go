@@ -27,6 +27,6 @@ type Fio struct {
 }
 
 type Passport struct {
-	Series int
-	Number int
+	Series string
+	Number string
 }
