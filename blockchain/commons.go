@@ -57,7 +57,7 @@ func (b *blockChainRep) CreateVotingEvent() (*domain.VotingEventResponse, error)
 	return &result, nil
 }
 
-func (b *blockChainRep) RegisterVotersList(req domain.RegisterVoterRequest) (*domain.RegisterVotersListResponse, error) {
+func (b *blockChainRep) RegisterVotersList(req domain.RegisterVoterListRequest) (*domain.RegisterVotersListResponse, error) {
 	result := domain.RegisterVotersListResponse{}
 	response := domain.Response{Result: &result}
 	if err := b.client.Invoke("POST", b.bch.Address+registerVotersList, b.headers, req, response); err != nil {
