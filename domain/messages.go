@@ -2,17 +2,12 @@ package domain
 
 import (
 	"gitlab.alx/mdm-ext/mdm-elect-lib/blockchain"
+	"gitlab.alx/mdm-ext/mdm-elect-lib/digest"
 	"time"
 )
 
-type MessageDigest struct {
-	Timestamp  int64  `json:"timestamp"`
-	Random     int64  `json:"random"`
-	SecureHash string `json:"secureHash"`
-}
-
 type ElectMessage struct {
-	MessageDigest
+	digest.MessageDigest
 	Id   string
 	Time time.Time
 	Type string

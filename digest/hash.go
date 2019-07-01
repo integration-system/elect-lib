@@ -4,7 +4,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"gitlab.alx/mdm-ext/mdm-elect-lib/domain"
 	"math/rand"
 	"time"
 )
@@ -13,11 +12,17 @@ const (
 	randomLength = 1000000000
 )
 
-func MakeDigest(secret string) domain.MessageDigest {
+type MessageDigest struct {
+	Timestamp  int64  `json:"timestamp"`
+	Random     int64  `json:"random"`
+	SecureHash string `json:"secureHash"`
+}
+
+func MakeDigest(secret string) MessageDigest {
 	timestamp := time.Now().Unix()
 	random := rand.Int63n(randomLength)
 
-	return domain.MessageDigest{
+	return MessageDigest{
 		Timestamp:  timestamp,
 		Random:     random,
 		SecureHash: makeDigest(timestamp, random, secret),
