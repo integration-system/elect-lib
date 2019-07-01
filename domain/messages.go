@@ -19,5 +19,5 @@ type ElectMessage struct {
 
 type RegisterVoterMessage struct {
 	ElectMessage
-	Payload []string
+	Payload string
 }
