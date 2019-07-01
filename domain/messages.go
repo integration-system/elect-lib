@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"gitlab.alx/mdm-ext/mdm-elect-lib/blockchain/domain"
 	"time"
 )
 
@@ -20,4 +21,9 @@ type ElectMessage struct {
 type RegisterVoterMessage struct {
 	ElectMessage
 	Payload []string
+}
+
+type IssueBallotMessage struct {
+	ElectMessage
+	Payload domain.IssueBallotRequest
 }
