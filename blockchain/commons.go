@@ -2,31 +2,30 @@ package blockchain
 
 import (
 	"github.com/integration-system/isp-lib/http"
-	"gitlab.alx/mdm-ext/mdm-elect-lib/blockchain/domain"
 )
 
-type blockChainRep struct {
-	bch     Blockchain
+type blockchainClient struct {
+	bch     BlockchainConfig
 	headers map[string]string
 	client  http.RestClient
 }
 
-func newBlockChain(client http.RestClient) *blockChainRep {
-	return &blockChainRep{client: client}
+func NewBlockchainClient(client http.RestClient) *blockchainClient {
+	return &blockchainClient{client: client}
 }
 
-func (b *blockChainRep) ReceiveConfiguration(bch Blockchain) {
+func (b *blockchainClient) ReceiveConfiguration(bch BlockchainConfig) {
 	b.headers = map[string]string{"Content-Type": "application/json"}
 	b.bch = bch
 }
 
-func (b *blockChainRep) Authenticate() (*domain.LoginResponse, error) {
-	request := domain.AuthenticateRequest{
+func (b *blockchainClient) Authenticate() (*LoginResponse, error) {
+	request := AuthenticateRequest{
 		Login:    b.bch.Login.Login,
 		Password: b.bch.Login.Password,
 	}
-	result := domain.LoginResponse{}
-	response := domain.Response{Result: &result}
+	result := LoginResponse{}
+	response := Response{Result: &result}
 	if err := b.client.Invoke("POST", b.bch.Address+authenticate, b.headers, request, &response); err != nil {
 		return nil, err
 	} else if response.Error != nil {
@@ -36,8 +35,8 @@ func (b *blockChainRep) Authenticate() (*domain.LoginResponse, error) {
 	return &result, nil
 }
 
-func (b *blockChainRep) Flush() error {
-	response := domain.Response{}
+func (b *blockchainClient) Flush() error {
+	response := Response{}
 	if err := http.NewJsonRestClient().Invoke("DELETE", b.bch.Address+flush, b.headers, nil, &response); err != nil {
 		return err
 	} else if response.Error != nil {
@@ -46,9 +45,9 @@ func (b *blockChainRep) Flush() error {
 	return nil
 }
 
-func (b *blockChainRep) CreateVotingEvent() (*domain.VotingEventResponse, error) {
-	result := domain.VotingEventResponse{}
-	response := domain.Response{Result: &result}
+func (b *blockchainClient) CreateVotingEvent() (*VotingEventResponse, error) {
+	result := VotingEventResponse{}
+	response := Response{Result: &result}
 	if err := b.client.Invoke("POST", b.bch.Address+createVotingEvent, b.headers, b.bch.VotingEventBody, &response); err != nil {
 		return nil, err
 	} else if response.Error != nil {
@@ -57,9 +56,9 @@ func (b *blockChainRep) CreateVotingEvent() (*domain.VotingEventResponse, error)
 	return &result, nil
 }
 
-func (b *blockChainRep) RegisterVotersList(req domain.RegisterVoterListRequest) (*domain.RegisterVotersListResponse, error) {
-	result := domain.RegisterVotersListResponse{}
-	response := domain.Response{Result: &result}
+func (b *blockchainClient) RegisterVotersList(req RegisterVoterListRequest) (*RegisterVotersListResponse, error) {
+	result := RegisterVotersListResponse{}
+	response := Response{Result: &result}
 	if err := b.client.Invoke("POST", b.bch.Address+registerVotersList, b.headers, req, response); err != nil {
 		return nil, err
 	} else if response.Error != nil {
@@ -68,9 +67,9 @@ func (b *blockChainRep) RegisterVotersList(req domain.RegisterVoterListRequest) 
 	return &result, nil
 }
 
-func (b *blockChainRep) IssueBallot(req domain.IssueBallotRequest) (*domain.Response, error) {
-	result := domain.IssueBallotResponse{}
-	response := domain.Response{Result: &result}
+func (b *blockchainClient) IssueBallot(req IssueBallotRequest) (*Response, error) {
+	result := IssueBallotResponse{}
+	response := Response{Result: &result}
 	if err := b.client.Invoke("POST", b.bch.Address+issueBallot, b.headers, req, &response); err != nil {
 		return &response, err
 	} else {
@@ -78,9 +77,9 @@ func (b *blockChainRep) IssueBallot(req domain.IssueBallotRequest) (*domain.Resp
 	}
 }
 
-func (b *blockChainRep) RegisterVoter(req domain.RegisterVoterRequest) (*domain.RegisterVoterResponse, error) {
-	result := domain.RegisterVoterResponse{}
-	response := domain.Response{Result: &result}
+func (b *blockchainClient) RegisterVoter(req RegisterVoterRequest) (*RegisterVoterResponse, error) {
+	result := RegisterVoterResponse{}
+	response := Response{Result: &result}
 	if err := b.client.Invoke("POST", b.bch.Address+registerVoter, b.headers, req, &response); err != nil {
 		return nil, err
 	} else if response.Error != nil {

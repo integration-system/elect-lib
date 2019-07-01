@@ -1,4 +1,4 @@
-package domain
+package blockchain
 
 type RegisterVoterRequest struct {
 	VoterId string
