@@ -67,14 +67,15 @@ func (b *blockchainClient) RegisterVotersList(req RegisterVoterListRequest) (*Re
 	return &result, nil
 }
 
-func (b *blockchainClient) IssueBallot(req IssueBallotRequest) (*Response, error) {
+func (b *blockchainClient) IssueBallot(req IssueBallotRequest) (*IssueBallotResponse, error) {
 	result := IssueBallotResponse{}
 	response := Response{Result: &result}
 	if err := b.client.Invoke("POST", b.bch.Address+issueBallot, b.headers, req, &response); err != nil {
-		return &response, err
-	} else {
-		return &response, nil
+		return nil, err
+	} else if response.Error != nil {
+		return nil, response.ConvertError()
 	}
+	return &result, nil
 }
 
 func (b *blockchainClient) RegisterVoter(req RegisterVoterRequest) (*RegisterVoterResponse, error) {
