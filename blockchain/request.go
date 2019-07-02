@@ -12,7 +12,7 @@ type IssueBallotRequest struct {
 	VoterId  string
 	VotingId int
 	Fio      Fio
-	Passport Passport
+	Passport *Passport `json:",omitempty"`
 }
 
 type AuthenticateRequest struct {
