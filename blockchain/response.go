@@ -40,6 +40,10 @@ type RegisterVotersListResponse struct {
 	VotersExisted int
 }
 
+type StoreBallotResponse struct {
+	Stored bool
+}
+
 type bchError struct {
 	error string
 }

@@ -2,6 +2,7 @@ package blockchain
 
 import (
 	"bytes"
+	"encoding/json"
 	"github.com/integration-system/isp-lib/http"
 	"io/ioutil"
 	http2 "net/http"
@@ -92,27 +93,43 @@ func (b *blockchainClient) RegisterVoter(req RegisterVoterRequest) (*RegisterVot
 	return &result, nil
 }
 
-func (b *blockchainClient) StoreBallot(req []byte) ([]byte, error) {
+func (b *blockchainClient) StoreBallot(req []byte) (*StoreBallotResponse, error) {
+	result := StoreBallotResponse{}
+	response := Response{Result: &result}
+
 	body := bytes.NewBuffer(req)
-	request, err := http2.NewRequest(http2.MethodPost, b.bch.Address+storeBallot, body)
+	clientReq, err := http2.NewRequest(http2.MethodPost, b.bch.Address+storeBallot, body)
 	if err != nil {
 		return nil, err
 	}
-	defer func() { _ = request.Body.Close() }()
+	defer func() { _ = clientReq.Body.Close() }()
 
 	for key, value := range b.headers {
-		request.Header.Set(key, value)
+		clientReq.Header.Set(key, value)
 	}
 
-	response, err := http2.DefaultClient.Do(request)
+	clientResp, err := http2.DefaultClient.Do(clientReq)
 	if err != nil {
 		return nil, err
 	}
-	defer func() { _ = response.Body.Close() }()
+	defer func() { _ = clientResp.Body.Close() }()
 
-	if resp, err := ioutil.ReadAll(response.Body); err != nil {
+	message, err := ioutil.ReadAll(clientResp.Body)
+	if err != nil {
 		return nil, err
-	} else {
-		return resp, nil
 	}
+	if clientResp.StatusCode != http2.StatusOK {
+		return nil, &http.ErrorResponse{
+			StatusCode: clientResp.StatusCode,
+			Status:     clientResp.Status,
+			Body:       string(message),
+		}
+	}
+
+	if err := json.Unmarshal(message, &response); err != nil {
+		return nil, err
+	} else if response.Error != nil {
+		return nil, response.ConvertError()
+	}
+	return &result, nil
 }
