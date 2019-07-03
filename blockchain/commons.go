@@ -1,7 +1,10 @@
 package blockchain
 
 import (
+	"bytes"
 	"github.com/integration-system/isp-lib/http"
+	"io/ioutil"
+	http2 "net/http"
 )
 
 type blockchainClient struct {
@@ -87,4 +90,29 @@ func (b *blockchainClient) RegisterVoter(req RegisterVoterRequest) (*RegisterVot
 		return nil, response.ConvertError()
 	}
 	return &result, nil
+}
+
+func (b *blockchainClient) StoreBallot(req []byte) ([]byte, error) {
+	body := bytes.NewBuffer(req)
+	request, err := http2.NewRequest(http2.MethodPost, b.bch.Address+storeBallot, body)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = request.Body.Close() }()
+
+	for key, value := range b.headers {
+		request.Header.Set(key, value)
+	}
+
+	response, err := http2.DefaultClient.Do(request)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = response.Body.Close() }()
+
+	if resp, err := ioutil.ReadAll(response.Body); err != nil {
+		return nil, err
+	} else {
+		return resp, nil
+	}
 }
