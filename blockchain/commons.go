@@ -62,7 +62,7 @@ func (b *blockchainClient) CreateVotingEvent() (*VotingEventResponse, error) {
 func (b *blockchainClient) RegisterVotersList(req RegisterVoterListRequest) (*RegisterVotersListResponse, error) {
 	result := RegisterVotersListResponse{}
 	response := Response{Result: &result}
-	if err := b.client.Invoke("POST", b.bch.Address+registerVotersList, b.headers, req, response); err != nil {
+	if err := b.client.Invoke("POST", b.bch.Address+registerVotersList, b.headers, req, &response); err != nil {
 		return nil, err
 	} else if response.Error != nil {
 		return nil, response.ConvertError()
