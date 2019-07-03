@@ -107,6 +107,7 @@ func (b *blockchainClient) StoreBallot(req []byte) (*StoreBallotResponse, error)
 	for key, value := range b.headers {
 		clientReq.Header.Set(key, value)
 	}
+	clientReq.Header.Set("Content-Type", "text/plain")
 
 	clientResp, err := http2.DefaultClient.Do(clientReq)
 	if err != nil {
