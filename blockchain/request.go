@@ -11,6 +11,7 @@ type RegisterVoterListRequest struct {
 type IssueBallotRequest struct {
 	VoterId  string
 	VotingId int
+	Version  string
 	Fio      Fio
 	Passport *Passport `json:",omitempty"`
 }
