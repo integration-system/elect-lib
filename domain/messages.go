@@ -1,8 +1,8 @@
 package domain
 
 import (
-	"gitlab.alx/mdm-ext/mdm-elect-lib/blockchain"
-	"gitlab.alx/mdm-ext/mdm-elect-lib/digest"
+	"github.com/integration-system/elect-lib/blockchain"
+	"github.com/integration-system/elect-lib/digest"
 	"time"
 )
 
