@@ -1,7 +1,5 @@
 package blockchain
 
-import "fmt"
-
 type Response struct {
 	Error *struct {
 		Code    int
@@ -9,11 +7,6 @@ type Response struct {
 		Message string
 	}
 	Result interface{}
-}
-
-type LoginResponse struct {
-	Login string
-	Token string
 }
 
 type VotingEventResponse struct {
@@ -42,21 +35,4 @@ type RegisterVotersListResponse struct {
 
 type StoreBallotResponse struct {
 	Stored bool
-}
-
-type bchError struct {
-	error string
-}
-
-func (b bchError) Error() string {
-	return b.error
-}
-
-func (b Response) ConvertError() error {
-	if b.Error == nil {
-		return nil
-	}
-	return bchError{
-		error: fmt.Sprintf("Code: %d Message %s Detaild %s", b.Error.Code, b.Error.Message, b.Error.Details),
-	}
 }
