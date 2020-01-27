@@ -16,11 +16,6 @@ type IssueBallotRequest struct {
 	Passport *Passport `json:",omitempty"`
 }
 
-type AuthenticateRequest struct {
-	Login    string
-	Password string
-}
-
 type Fio struct {
 	Firstname  string
 	Surname    string
