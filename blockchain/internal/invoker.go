@@ -87,7 +87,8 @@ func (b *Client) invoke(uri string, request []byte) ([]byte, error) {
 			Body:       string(res.Body()),
 		}
 	}
-	return res.Body(), nil
+	response := res.Body()
+	return response, nil
 }
 
 func (b *Client) auth() error {
