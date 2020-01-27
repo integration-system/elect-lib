@@ -3,14 +3,17 @@ package internal
 import (
 	json "github.com/json-iterator/go"
 	"github.com/valyala/fasthttp"
+	"sync"
 	"time"
 )
 
 type Client struct {
-	login    string
-	password string
-	headers  map[string]string
-	cli      *fasthttp.HostClient
+	login            string
+	password         string
+	headers          map[string]string
+	completeInitAuth bool
+	cli              *fasthttp.HostClient
+	mx               sync.Mutex
 }
 
 func NewClient(address, login, password string) *Client {
@@ -20,21 +23,20 @@ func NewClient(address, login, password string) *Client {
 		headers:  map[string]string{"Content-Type": "application/json"},
 		cli:      &fasthttp.HostClient{Addr: address},
 	}
-	_ = cli.auth()
 	return cli
 }
 
 func (b *Client) Invoke(url string, request []byte, responsePtr interface{}) error {
 	response := Response{Result: responsePtr}
-	err := b.invokeWithConvertResponse(url, request, &response)
+	statusCode, err := b.invokeWithConvertResponse(url, request, &response)
 	if err != nil {
 		return err
 	}
 	if response.Error != nil {
-		if response.Error.Code == authenticateErrorCode {
+		if statusCode == fasthttp.StatusUnauthorized {
 			err := b.auth()
 			if err == nil {
-				err = b.invokeWithConvertResponse(url, request, &response)
+				_, err = b.invokeWithConvertResponse(url, request, &response)
 				if err != nil {
 					return err
 				}
@@ -49,16 +51,25 @@ func (b *Client) Invoke(url string, request []byte, responsePtr interface{}) err
 	return nil
 }
 
-func (b *Client) invokeWithConvertResponse(url string, request []byte, respPtr interface{}) error {
-	response, err := b.invoke(url, request)
+func (b *Client) invokeWithConvertResponse(url string, request []byte, respPtr interface{}) (int, error) {
+	response, statusCode, err := b.invoke(url, request)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	err = json.Unmarshal(response, respPtr)
-	return err
+	if err != nil {
+		return 0, err
+	}
+	return statusCode, nil
 }
 
-func (b *Client) invoke(uri string, request []byte) ([]byte, error) {
+func (b *Client) invoke(uri string, request []byte) ([]byte, int, error) {
+	if !b.completeInitAuth {
+		err := b.auth()
+		if err != nil {
+			return nil, 0, err
+		}
+	}
 	req, res := fasthttp.AcquireRequest(), fasthttp.AcquireResponse()
 	defer fasthttp.ReleaseRequest(req)
 	defer fasthttp.ReleaseResponse(res)
@@ -76,22 +87,18 @@ func (b *Client) invoke(uri string, request []byte) ([]byte, error) {
 
 	err := b.cli.DoTimeout(req, res, time.Second*15)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	statusCode := res.StatusCode()
-	if statusCode != fasthttp.StatusOK {
-		return nil, ErrorResponse{
-			StatusCode: statusCode,
-			Status:     fasthttp.StatusMessage(statusCode),
-			Body:       string(res.Body()),
-		}
-	}
 	response := res.Body()
-	return response, nil
+	return response, statusCode, nil
 }
 
 func (b *Client) auth() error {
+	b.mx.Lock()
+	b.completeInitAuth = true
+	b.mx.Unlock()
 	request := authenticateRequest{
 		Login:    b.login,
 		Password: b.password,
@@ -102,13 +109,15 @@ func (b *Client) auth() error {
 	}
 	result := authenticateResponse{}
 	response := Response{Result: &result}
-	err = b.invokeWithConvertResponse(authenticateMethod, req, &response)
+	_, err = b.invokeWithConvertResponse(authenticateMethod, req, &response)
 	if err != nil {
 		return err
 	}
 	if response.Error != nil {
 		return response.ConvertError()
 	}
+	b.mx.Lock()
 	b.headers["Authorization"] = "Bearer " + result.Token
+	b.mx.Unlock()
 	return nil
 }
