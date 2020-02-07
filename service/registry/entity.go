@@ -47,8 +47,7 @@ type (
 	}
 
 	Contact struct {
-		Value      string
-		Deleted    bool
-		Validation bool
+		Value   string
+		Deleted bool
 	}
 )
