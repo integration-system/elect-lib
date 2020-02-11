@@ -44,7 +44,7 @@ type (
 	}
 
 	Citizen struct {
-		Id      int
+		Id      string
 		Version int64
 		Data    Data
 	}

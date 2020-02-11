@@ -8,4 +8,5 @@ type VoterChangedEvent struct {
 	FromState registry.VoterState
 	ToState   registry.VoterState
 	Voter     registry.Voter
+	Citizen   registry.Citizen
 }
