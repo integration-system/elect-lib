@@ -1,13 +1,46 @@
 package registry
 
+import (
+	"time"
+)
+
+const (
+	VoterStateRevoked  VoterState = -1
+	VoterStateEmpty    VoterState = 0
+	VoterStateNotValid VoterState = 1
+	VoterStateValid    VoterState = 2
+	VoterStateVoted    VoterState = 3
+)
+
+type VoterState int32
+
+func (s VoterState) CanVote() bool {
+	switch s {
+	case VoterStateValid:
+		return true
+	default:
+		return false
+	}
+}
+
+func (s VoterState) CanUpdateValidation() bool {
+	switch s {
+	case VoterStateNotValid, VoterStateValid:
+		return true
+	default:
+		return false
+	}
+}
+
 type (
 	Voter struct {
-		CitizenId             int
-		ElectionId            int
-		ElectStatus           string
+		CitizenId             string `pg:",pk"`
+		ElectionId            int    `pg:",pk"`
+		State                 VoterState
 		ValidationDescription map[string]interface{}
 		Extra                 map[string]interface{}
-		RegistrationLocked    bool
+		RequestId             string
+		UpdatedAt             time.Time
 	}
 
 	Citizen struct {
