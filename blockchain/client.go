@@ -113,7 +113,7 @@ func (b *client) invoke(url string, request []byte, responsePtr interface{}, dep
 	}
 	if statusCode >= fasthttp.StatusMultipleChoices {
 		if response.Error != nil {
-			return response.ConvertError()
+			return response.Error
 		} else {
 			return fmt.Errorf("unknown response: %v", response)
 		}
@@ -145,7 +145,7 @@ func (b *client) doAuth() error {
 		return err
 	}
 	if response.Error != nil {
-		return response.ConvertError()
+		return response.Error
 	}
 
 	b.headers["Authorization"] = "Bearer " + result.Token

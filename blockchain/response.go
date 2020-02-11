@@ -2,30 +2,19 @@ package blockchain
 
 import "fmt"
 
-type Response struct {
-	Error *struct {
-		Code    int
-		Details []interface{}
-		Message string
-	}
-	Result interface{}
-}
-
-func (b Response) ConvertError() error {
-	if b.Error == nil {
-		return nil
-	}
-	return BchError{
-		error: fmt.Sprintf("code: '%d' message '%s' details: '%v'", b.Error.Code, b.Error.Message, b.Error.Details),
-	}
-}
-
 type BchError struct {
-	error string
+	Code    int
+	Details []interface{}
+	Message string
 }
 
-func (b BchError) Error() string {
-	return b.error
+func (err *BchError) Error() string {
+	return fmt.Sprintf("code: '%d' message '%s' details: '%v'", err.Code, err.Message, err.Details)
+}
+
+type Response struct {
+	Error  *BchError
+	Result interface{}
 }
 
 type VotingEventResponse struct {
