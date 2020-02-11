@@ -7,5 +7,5 @@ import (
 type VoterChangedEvent struct {
 	FromState registry.VoterState
 	ToState   registry.VoterState
-	Voter     *registry.Voter
+	Voter     registry.Voter
 }
