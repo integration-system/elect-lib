@@ -1,10 +1,15 @@
 package blockchain
 
 import (
+	"fmt"
 	"github.com/integration-system/elect-lib/blockchain/internal"
 	"github.com/json-iterator/go"
 	"github.com/valyala/fasthttp"
 	"sync"
+)
+
+const (
+	maxAuthRetries = 10
 )
 
 var (
@@ -40,7 +45,7 @@ func (b *client) RegisterVotersList(req RegisterVoterListRequest) (*RegisterVote
 		return nil, err
 	}
 	response := new(RegisterVotersListResponse)
-	err = b.invoke(registerVotersList, request, response)
+	err = b.invoke(registerVotersList, request, response, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +58,7 @@ func (b *client) IssueBallot(req IssueBallotRequest) (*IssueBallotResponse, erro
 		return nil, err
 	}
 	response := new(IssueBallotResponse)
-	err = b.invoke(issueBallot, request, response)
+	err = b.invoke(issueBallot, request, response, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +71,7 @@ func (b *client) RegisterVoter(req RegisterVoterRequest) (*RegisterVoterResponse
 		return nil, err
 	}
 	response := new(RegisterVoterResponse)
-	err = b.invoke(registerVoter, request, response)
+	err = b.invoke(registerVoter, request, response, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -75,14 +80,14 @@ func (b *client) RegisterVoter(req RegisterVoterRequest) (*RegisterVoterResponse
 
 func (b *client) StoreBallot(req []byte) (*StoreBallotResponse, error) {
 	response := new(StoreBallotResponse)
-	err := b.invoke(storeBallot, req, response)
+	err := b.invoke(storeBallot, req, response, 0)
 	if err != nil {
 		return nil, err
 	}
 	return response, nil
 }
 
-func (b *client) invoke(url string, request []byte, responsePtr interface{}) error {
+func (b *client) invoke(url string, request []byte, responsePtr interface{}, depth int) error {
 	b.mx.RLock()
 	authDone := b.authenticated
 	b.mx.RUnlock()
@@ -102,10 +107,16 @@ func (b *client) invoke(url string, request []byte, responsePtr interface{}) err
 		b.mx.Lock()
 		b.authenticated = false
 		b.mx.Unlock()
-		return b.invoke(url, request, responsePtr)
+		if depth < maxAuthRetries {
+			return b.invoke(url, request, responsePtr, depth+1)
+		}
 	}
-	if response.Error != nil {
-		return response.ConvertError()
+	if statusCode >= fasthttp.StatusMultipleChoices {
+		if response.Error != nil {
+			return response.ConvertError()
+		} else {
+			return fmt.Errorf("unknown response: %v", response)
+		}
 	}
 	return nil
 }
