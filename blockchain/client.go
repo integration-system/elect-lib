@@ -115,7 +115,7 @@ func (b *client) invoke(url string, request []byte, responsePtr interface{}, dep
 		if response.Error != nil {
 			return response.Error
 		} else {
-			return fmt.Errorf("unknown response: %v", response)
+			return fmt.Errorf("unknown response: %v with status code: %d", response, statusCode)
 		}
 	}
 	return nil
