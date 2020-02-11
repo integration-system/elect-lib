@@ -44,9 +44,10 @@ type (
 	}
 
 	Citizen struct {
-		Id      string
-		Version int64
-		Data    Data
+		Id        string
+		Version   int64
+		Data      Data
+		UpdatedAt time.Time
 	}
 
 	Data struct {
