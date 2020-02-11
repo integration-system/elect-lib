@@ -26,3 +26,13 @@ type Passport struct {
 	Series string
 	Number string
 }
+
+type authenticateRequest struct {
+	Login    string
+	Password string
+}
+
+type authenticateResponse struct {
+	Login string
+	Token string
+}

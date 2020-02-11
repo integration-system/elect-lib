@@ -2,7 +2,13 @@ package blockchain
 
 import (
 	"github.com/integration-system/elect-lib/blockchain/internal"
-	json "github.com/json-iterator/go"
+	"github.com/json-iterator/go"
+	"github.com/valyala/fasthttp"
+	"sync"
+)
+
+var (
+	json = jsoniter.ConfigFastest
 )
 
 type Client interface {
@@ -13,11 +19,19 @@ type Client interface {
 }
 
 type client struct {
-	cli *internal.Client
+	transport     internal.Transport
+	cfg           Config
+	headers       map[string]string
+	authenticated bool
+	mx            sync.RWMutex
 }
 
-func NewBlockchainClient(config BlockchainConfig) *client {
-	return &client{cli: internal.NewClient(config.Address, config.Login.Login, config.Login.Password)}
+func NewClient(config Config) *client {
+	return &client{
+		cfg:       config,
+		headers:   map[string]string{"Content-Type": "application/json"},
+		transport: internal.NewHttpTransport(config.Address),
+	}
 }
 
 func (b *client) RegisterVotersList(req RegisterVoterListRequest) (*RegisterVotersListResponse, error) {
@@ -26,7 +40,7 @@ func (b *client) RegisterVotersList(req RegisterVoterListRequest) (*RegisterVote
 		return nil, err
 	}
 	response := new(RegisterVotersListResponse)
-	err = b.cli.Invoke(registerVotersList, request, response)
+	err = b.invoke(registerVotersList, request, response)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +53,7 @@ func (b *client) IssueBallot(req IssueBallotRequest) (*IssueBallotResponse, erro
 		return nil, err
 	}
 	response := new(IssueBallotResponse)
-	err = b.cli.Invoke(issueBallot, request, response)
+	err = b.invoke(issueBallot, request, response)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +66,7 @@ func (b *client) RegisterVoter(req RegisterVoterRequest) (*RegisterVoterResponse
 		return nil, err
 	}
 	response := new(RegisterVoterResponse)
-	err = b.cli.Invoke(registerVoter, request, response)
+	err = b.invoke(registerVoter, request, response)
 	if err != nil {
 		return nil, err
 	}
@@ -61,9 +75,68 @@ func (b *client) RegisterVoter(req RegisterVoterRequest) (*RegisterVoterResponse
 
 func (b *client) StoreBallot(req []byte) (*StoreBallotResponse, error) {
 	response := new(StoreBallotResponse)
-	err := b.cli.Invoke(storeBallot, req, response)
+	err := b.invoke(storeBallot, req, response)
 	if err != nil {
 		return nil, err
 	}
 	return response, nil
+}
+
+func (b *client) invoke(url string, request []byte, responsePtr interface{}) error {
+	b.mx.RLock()
+	authDone := b.authenticated
+	b.mx.RUnlock()
+	if !authDone {
+		err := b.doAuth()
+		if err != nil {
+			return err
+		}
+	}
+
+	response := Response{Result: responsePtr}
+	statusCode, err := b.transport.Invoke(url, b.headers, request, &response)
+	if err != nil {
+		return err
+	}
+	if statusCode == fasthttp.StatusUnauthorized {
+		b.mx.Lock()
+		b.authenticated = false
+		b.mx.Unlock()
+		return b.invoke(url, request, responsePtr)
+	}
+	if response.Error != nil {
+		return response.ConvertError()
+	}
+	return nil
+}
+
+func (b *client) doAuth() error {
+	b.mx.Lock()
+	defer b.mx.Unlock()
+
+	if b.authenticated {
+		return nil
+	}
+	b.authenticated = true
+	request := authenticateRequest{
+		Login:    b.cfg.Login.Login,
+		Password: b.cfg.Login.Password,
+	}
+	req, err := json.Marshal(request)
+	if err != nil {
+		return err
+	}
+	result := authenticateResponse{}
+	response := Response{Result: &result}
+	delete(b.headers, "Authorization")
+	_, err = b.transport.Invoke(authenticateMethod, b.headers, req, &response)
+	if err != nil {
+		return err
+	}
+	if response.Error != nil {
+		return response.ConvertError()
+	}
+
+	b.headers["Authorization"] = "Bearer " + result.Token
+	return nil
 }

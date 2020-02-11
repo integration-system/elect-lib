@@ -5,4 +5,5 @@ const (
 	issueBallot        = "/issueBallot"
 	registerVoter      = "/registerVoter"
 	storeBallot        = "/storeBallot"
+	authenticateMethod = "/authenticate"
 )
