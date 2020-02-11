@@ -11,7 +11,7 @@ type (
 	ElectionInfo struct {
 		Name               string `valid:"required~Required"`
 		Description        string
-		Extra              interface{}
+		Extra              map[string]interface{}
 		VotingStart        time.Time `valid:"required~Required"`
 		VotingEnd          time.Time `valid:"required~Required"`
 		RegStart           time.Time `valid:"required~Required"`
