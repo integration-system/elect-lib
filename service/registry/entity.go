@@ -44,9 +44,9 @@ type (
 	}
 
 	Citizen struct {
-		Id        string
+		Id        string `sql:",pk"`
 		Version   int64
-		Data      Data
+		Data      *Data
 		UpdatedAt time.Time
 	}
 
