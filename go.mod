@@ -3,7 +3,7 @@ module github.com/integration-system/elect-lib
 go 1.13
 
 require (
-	github.com/asaskevich/govalidator v0.0.0-20200108200545-475eaeb16496 // indirect
+	github.com/asaskevich/govalidator v0.0.0-20180315120708-ccb8e960c48f // indirect
 	github.com/integration-system/go-cmp v0.0.0-20190131081942-ac5582987a2f // indirect
 	github.com/integration-system/isp-lib v2.1.0+incompatible
 	github.com/integration-system/isp-log v0.0.0-20200210161955-ad49cab587ef // indirect
