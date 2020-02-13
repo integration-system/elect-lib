@@ -64,24 +64,24 @@ type (
 
 	Passport struct {
 		Document
-		Series string
+		Series string `json:"series"`
 	}
 
 	Document struct {
-		Value      string
-		Deleted    bool
-		Validation bool
+		Value      string `json:"value"`
+		Deleted    bool   `json:"deleted"`
+		Validation bool   `json:"validation"`
 	}
 
 	Address struct {
-		Unom       string
-		Unad       string
-		Deleted    bool
-		Validation bool
+		Unom       string `json:"unom"`
+		Unad       string `json:"unad"`
+		Deleted    bool   `json:"deleted"`
+		Validation bool   `json:"validation"`
 	}
 
 	Contact struct {
-		Value   string
-		Deleted bool
+		Value   string `json:"value"`
+		Deleted bool   `json:"deleted"`
 	}
 )
