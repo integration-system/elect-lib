@@ -44,7 +44,7 @@ type (
 	}
 
 	Citizen struct {
-		Id        string `sql:",pk"`
+		Id        string `pg:",pk"`
 		Version   int64
 		Data      *Data
 		UpdatedAt time.Time

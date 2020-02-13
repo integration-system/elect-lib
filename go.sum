@@ -90,7 +90,6 @@ github.com/integration-system/go-cmp v0.0.0-20190131081942-ac5582987a2f h1:52UOJ
 github.com/integration-system/go-cmp v0.0.0-20190131081942-ac5582987a2f/go.mod h1:w+dmaWojuIwNujSYg6qt1wKHhSdorLOivCEl/XuLzbM=
 github.com/integration-system/gowsdl v1.0.0/go.mod h1:ZwTCE+Av5aQLnPj2/3PIop6mzCs1FY7jXrcWDvSjrBA=
 github.com/integration-system/isp-etp-go v2.0.2+incompatible/go.mod h1:NdgczkoFCer9SZOx674EVXCcKRIhFe8LYnwNwoIMDhI=
-github.com/integration-system/isp-lib v2.1.0+incompatible h1:ANnDn3PEi9jnFapBr9d8ohXBzAMGDCDgn6cANWk9Soo=
 github.com/integration-system/isp-lib/v2 v2.2.0 h1:qabF1/Q66Z0ldOIlsztD/P4WEuskYICFJHjMoJhUi08=
 github.com/integration-system/isp-lib/v2 v2.2.0/go.mod h1:s3UWKnmCns7uaxAX1i04Le32+FFuoDgp8QLhOZAmNZE=
 github.com/integration-system/isp-log v1.0.0 h1:9i/2DLgkrP6NQDw371/xm1SBMPJ9sMBlzVIO912s4Fk=
