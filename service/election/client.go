@@ -27,6 +27,18 @@ func (c *grpcClient) GetElectionById(req IdentityRequest) (*Election, error) {
 	return res, err
 }
 
+func (c *grpcClient) GetRegElectionById(req IdentityRequest) (*Election, error) {
+	res := new(Election)
+	err := c.cc.Invoke(getRegElectionById, c.callerId, req, res)
+	return res, err
+}
+
+func (c *grpcClient) GetVotingElectionById(req IdentityRequest) (*Election, error) {
+	res := new(Election)
+	err := c.cc.Invoke(getVotingElectionById, c.callerId, req, res)
+	return res, err
+}
+
 func NewGrpcClient(cli *backend.RxGrpcClient, callerId int) Service {
 	return &grpcClient{
 		cc:       cli,
