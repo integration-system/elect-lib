@@ -54,10 +54,10 @@ type (
 		CitizenId             string `pg:",pk"`
 		ElectionId            int    `pg:",pk"`
 		State                 VoterState
-		ValidationDescription map[string]interface{}
-		Extra                 map[string]interface{}
+		ValidationDescription map[string]interface{} `pg:",default:'',use_zero"`
+		Extra                 map[string]interface{} `pg:",default:'',use_zero"`
 		RequestId             string
-		UpdatedAt             time.Time
+		UpdatedAt             time.Time `pg:",default:'NOW()',use_zero"`
 	}
 
 	Citizen struct {
