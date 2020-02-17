@@ -14,7 +14,7 @@ const (
 
 type VoterState int32
 
-func (s VoterState) String() string {
+func (s VoterState) ToString() string {
 	switch s {
 	case VoterStateRevoked:
 		return "Revoked"
