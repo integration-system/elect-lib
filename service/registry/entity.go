@@ -5,14 +5,31 @@ import (
 )
 
 const (
-	VoterStateRevoked  VoterState = -1
-	VoterStateEmpty    VoterState = 0
-	VoterStateNotValid VoterState = 1
-	VoterStateValid    VoterState = 2
-	VoterStateVoted    VoterState = 3
+	VoterStateRevoked      VoterState = -1
+	VoterStateEmpty        VoterState = 0
+	VoterStateNotValid     VoterState = 1
+	VoterStateValid        VoterState = 2
+	VoterStateBallotIssued VoterState = 3
 )
 
 type VoterState int32
+
+func (s VoterState) String() string {
+	switch s {
+	case VoterStateRevoked:
+		return "Revoked"
+	case VoterStateEmpty:
+		return "Empty"
+	case VoterStateNotValid:
+		return "Invalid"
+	case VoterStateValid:
+		return "Valid"
+	case VoterStateBallotIssued:
+		return "BallotIssued"
+	default:
+		return "Unknown"
+	}
+}
 
 func (s VoterState) CanVote() bool {
 	switch s {
@@ -54,7 +71,7 @@ type (
 		FirstName  string    `json:"first_name"`
 		MiddleName string    `json:"middle_name"`
 		LastName   string    `json:"last_name"`
-		BirthDate  string    `json:"birth_date"`
+		BirthDate  time.Time `json:"birth_date"`
 		Sso        string    `json:"sso"`
 		Passport   *Passport `json:"doc_passport_rf"`
 		Phone      *Contact  `json:"contact_mobile_registration"`
