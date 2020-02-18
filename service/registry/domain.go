@@ -41,6 +41,10 @@ type DeleteVotersByElectionRequest struct {
 	ElectionId int `valid:"required~Required"`
 }
 
+type GetElectionStatsRequest struct {
+	ElectionId int `valid:"required~Required"`
+}
+
 type ExportVotersRequest struct {
 	ElectionId int `valid:"required~Required"`
 	Filter     SearchVotersRequestFilter
@@ -92,6 +96,11 @@ type SearchVotersResponse struct {
 }
 
 type VotersDeletedResponse struct {
+	Count int
+}
+
+type ElectionStatsResponse struct {
+	State VoterState
 	Count int
 }
 
