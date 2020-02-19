@@ -4,6 +4,8 @@ import (
 	"time"
 )
 
+const AllStates = 100
+
 // Request
 
 type GetAvailableElectionsRequest struct {
