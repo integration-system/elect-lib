@@ -61,12 +61,12 @@ type SearchVotersRequestFilter struct {
 	ByState    int
 	BySnils    string
 	ByPassport *struct {
-		Series string
-		Number string
+		Series string `valid:"required~Required"`
+		Number string `valid:"required~Required"`
 	}
 	ByFio *struct {
-		FirstName  string
-		LastName   string
+		FirstName  string `valid:"required~Required"`
+		LastName   string `valid:"required~Required"`
 		MiddleName string
 		BirthDate  time.Time
 	}
