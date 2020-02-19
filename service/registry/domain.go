@@ -102,8 +102,12 @@ type VotersDeletedResponse struct {
 }
 
 type ElectionStatsResponse struct {
-	State VoterState
-	Count int
+	RevokedCount      int
+	EmptyCount        int
+	InvalidCount      int
+	ValidCount        int
+	BallotIssuedCount int
+	TotalCount        int
 }
 
 type CitizenVoter struct {
