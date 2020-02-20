@@ -103,7 +103,6 @@ type VotersDeletedResponse struct {
 
 type ElectionStatsResponse struct {
 	RevokedCount      int
-	EmptyCount        int
 	InvalidCount      int
 	ValidCount        int
 	BallotIssuedCount int
