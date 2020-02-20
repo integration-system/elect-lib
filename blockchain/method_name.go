@@ -1,9 +1,9 @@
 package blockchain
 
 const (
-	registerVotersList = "/registerVotersList"
-	issueBallot        = "/issueBallot"
-	registerVoter      = "/registerVoter"
-	storeBallot        = "/storeBallot"
-	authenticateMethod = "/authenticate"
+	registerVotersList  = "/registerVotersList"
+	issueBallot         = "/issueBallot"
+	storeBallot         = "/storeBallot"
+	authenticateMethod  = "/authenticate"
+	revokeParticipation = "/revokeParticipation"
 )

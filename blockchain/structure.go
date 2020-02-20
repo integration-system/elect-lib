@@ -1,6 +1,6 @@
 package blockchain
 
-type Config struct {
+type BchConfig struct {
 	Login   Login  `valid:"required~Required"`
 	Address string `valid:"required~Required"`
 }

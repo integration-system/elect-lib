@@ -9,7 +9,7 @@ type BchError struct {
 }
 
 func (err *BchError) Error() string {
-	return fmt.Sprintf("code: '%d' message '%s' details: '%v'", err.Code, err.Message, err.Details)
+	return fmt.Sprintf("code: '%d' message: '%s' details: '%v'", err.Code, err.Message, err.Details)
 }
 
 type Response struct {
@@ -17,28 +17,23 @@ type Response struct {
 	Result interface{}
 }
 
-type VotingEventResponse struct {
-	VotersRegistryAddress  string
-	BallotsRegistryAddress string
-}
-
 type IssueBallotResponse struct {
-	IssuedFor issuedFor
+	IssuedFor IssuedFor
 }
 
-type issuedFor struct {
+type IssuedFor struct {
 	VoterId  string
 	VotingId int
-}
-
-type RegisterVoterResponse struct {
-	VoterId string
-	Added   bool
 }
 
 type RegisterVotersListResponse struct {
 	VotersAdded   int
 	VotersExisted int
+}
+
+type RevokeParticipationResponse struct {
+	VoterId string
+	Revoked bool
 }
 
 type StoreBallotResponse struct {

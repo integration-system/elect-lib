@@ -40,9 +40,11 @@ func (b *httpTransport) Invoke(uri string, headers map[string]string, request []
 	}
 
 	statusCode := res.StatusCode()
-	err = json.Unmarshal(res.Body(), respPtr)
-	if err != nil {
-		return 0, err
+	if respPtr != nil {
+		err = json.Unmarshal(res.Body(), respPtr)
+		if err != nil {
+			return 0, err
+		}
 	}
 	return statusCode, nil
 }

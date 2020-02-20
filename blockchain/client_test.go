@@ -19,7 +19,7 @@ func (t *stubTransport) Invoke(uri string, header map[string]string, request []b
 	} else {
 		val := atomic.AddInt32(&t.invokeCounter, 1)
 		switch val {
-		case 4, 7:
+		case 4, 7, 55:
 			return fasthttp.StatusUnauthorized, nil
 		default:
 			return 0, json.Unmarshal([]byte(`{"result": {"issuedFor": {"voterId": "123", "votingId": 123}}}`), respPtr)
@@ -28,7 +28,7 @@ func (t *stubTransport) Invoke(uri string, header map[string]string, request []b
 }
 
 func TestClient_IssueBallot(t *testing.T) {
-	cli := NewClient(Config{
+	cli := NewClient(BchConfig{
 		Login: Login{
 			Login:    "test",
 			Password: "test",
@@ -36,7 +36,8 @@ func TestClient_IssueBallot(t *testing.T) {
 		Address: "test.com",
 	})
 	trans := &stubTransport{}
-	cli.transport = trans
+	client := cli.(*client)
+	client.transport = trans
 
 	wg := sync.WaitGroup{}
 	for i := 0; i < 100; i++ {
@@ -54,7 +55,7 @@ func TestClient_IssueBallot(t *testing.T) {
 	}
 	wg.Wait()
 
-	if trans.authCount != 3 {
+	if trans.authCount != 4 {
 		t.Fatalf("ath count %d != %d", trans.authCount, 3)
 	}
 }

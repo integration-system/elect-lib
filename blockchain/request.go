@@ -1,6 +1,6 @@
 package blockchain
 
-type RegisterVoterRequest struct {
+type VoterRequest struct {
 	VoterId string
 }
 
@@ -9,22 +9,9 @@ type RegisterVoterListRequest struct {
 }
 
 type IssueBallotRequest struct {
-	VoterId  string
-	VotingId int
-	Version  string
-	Fio      Fio
-	Passport *Passport `json:",omitempty"`
-}
-
-type Fio struct {
-	Firstname  string
-	Surname    string
-	Patronymic string
-}
-
-type Passport struct {
-	Series string
-	Number string
+	VoterId    string
+	DistrictId int
+	Version    string
 }
 
 type authenticateRequest struct {

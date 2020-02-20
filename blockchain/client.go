@@ -19,19 +19,19 @@ var (
 type Client interface {
 	RegisterVotersList(req RegisterVoterListRequest) (*RegisterVotersListResponse, error)
 	IssueBallot(req IssueBallotRequest) (*IssueBallotResponse, error)
-	RegisterVoter(req RegisterVoterRequest) (*RegisterVoterResponse, error)
+	RevokeParticipation(req VoterRequest) (*RevokeParticipationResponse, error)
 	StoreBallot(req []byte) (*StoreBallotResponse, error)
 }
 
 type client struct {
 	transport     internal.Transport
-	cfg           Config
+	cfg           BchConfig
 	headers       map[string]string
 	authenticated bool
 	mx            sync.RWMutex
 }
 
-func NewClient(config Config) *client {
+func NewClient(config BchConfig) Client {
 	return &client{
 		cfg:       config,
 		headers:   map[string]string{"Content-Type": "application/json"},
@@ -52,6 +52,19 @@ func (b *client) RegisterVotersList(req RegisterVoterListRequest) (*RegisterVote
 	return response, nil
 }
 
+func (b *client) RevokeParticipation(req VoterRequest) (*RevokeParticipationResponse, error) {
+	request, err := json.Marshal(req)
+	if err != nil {
+		return nil, err
+	}
+	response := new(RevokeParticipationResponse)
+	err = b.invoke(revokeParticipation, request, response, 0)
+	if err != nil {
+		return nil, err
+	}
+	return response, nil
+}
+
 func (b *client) IssueBallot(req IssueBallotRequest) (*IssueBallotResponse, error) {
 	request, err := json.Marshal(req)
 	if err != nil {
@@ -59,19 +72,6 @@ func (b *client) IssueBallot(req IssueBallotRequest) (*IssueBallotResponse, erro
 	}
 	response := new(IssueBallotResponse)
 	err = b.invoke(issueBallot, request, response, 0)
-	if err != nil {
-		return nil, err
-	}
-	return response, nil
-}
-
-func (b *client) RegisterVoter(req RegisterVoterRequest) (*RegisterVoterResponse, error) {
-	request, err := json.Marshal(req)
-	if err != nil {
-		return nil, err
-	}
-	response := new(RegisterVoterResponse)
-	err = b.invoke(registerVoter, request, response, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +128,6 @@ func (b *client) doAuth() error {
 	if b.authenticated {
 		return nil
 	}
-	b.authenticated = true
 	request := authenticateRequest{
 		Login:    b.cfg.Login.Login,
 		Password: b.cfg.Login.Password,
@@ -148,6 +147,7 @@ func (b *client) doAuth() error {
 		return response.Error
 	}
 
+	b.authenticated = true
 	b.headers["Authorization"] = "Bearer " + result.Token
 	return nil
 }
