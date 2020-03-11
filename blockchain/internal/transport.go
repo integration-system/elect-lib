@@ -15,7 +15,7 @@ type Transport interface {
 }
 
 type httpTransport struct {
-	cli *fasthttp.HostClient
+	cli *fasthttp.Client
 }
 
 func (b *httpTransport) Invoke(uri string, headers map[string]string, request []byte, respPtr interface{}) (int, error) {
@@ -49,9 +49,9 @@ func (b *httpTransport) Invoke(uri string, headers map[string]string, request []
 	return statusCode, nil
 }
 
-func NewHttpTransport(address string) Transport {
+func NewHttpTransport() Transport {
 	cli := &httpTransport{
-		cli: &fasthttp.HostClient{Addr: address},
+		cli: &fasthttp.Client{},
 	}
 	return cli
 }

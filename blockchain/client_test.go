@@ -33,7 +33,6 @@ func TestClient_IssueBallot(t *testing.T) {
 			Login:    "test",
 			Password: "test",
 		},
-		Address: "test.com",
 	})
 	trans := &stubTransport{}
 	client := cli.(*client)
@@ -56,6 +55,6 @@ func TestClient_IssueBallot(t *testing.T) {
 	wg.Wait()
 
 	if trans.authCount != 4 {
-		t.Fatalf("ath count %d != %d", trans.authCount, 3)
+		t.Fatalf("ath count %d != %d", trans.authCount, 4)
 	}
 }

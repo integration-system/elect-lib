@@ -35,7 +35,7 @@ func NewClient(config BchConfig) Client {
 	return &client{
 		cfg:       config,
 		headers:   map[string]string{"Content-Type": "application/json"},
-		transport: internal.NewHttpTransport(config.Address),
+		transport: internal.NewHttpTransport(),
 	}
 }
 
@@ -87,7 +87,7 @@ func (b *client) StoreBallot(req []byte) (*StoreBallotResponse, error) {
 	return response, nil
 }
 
-func (b *client) invoke(url string, request []byte, responsePtr interface{}, depth int) error {
+func (b *client) invoke(method string, request []byte, responsePtr interface{}, depth int) error {
 	b.mx.RLock()
 	authDone := b.authenticated
 	b.mx.RUnlock()
@@ -99,7 +99,7 @@ func (b *client) invoke(url string, request []byte, responsePtr interface{}, dep
 	}
 
 	response := Response{Result: responsePtr}
-	statusCode, err := b.transport.Invoke(url, b.headers, request, &response)
+	statusCode, err := b.transport.Invoke(b.uri(method), b.headers, request, &response)
 	if err != nil {
 		return err
 	}
@@ -108,7 +108,7 @@ func (b *client) invoke(url string, request []byte, responsePtr interface{}, dep
 		b.authenticated = false
 		b.mx.Unlock()
 		if depth < maxAuthRetries {
-			return b.invoke(url, request, responsePtr, depth+1)
+			return b.invoke(method, request, responsePtr, depth+1)
 		}
 	}
 	if statusCode >= fasthttp.StatusMultipleChoices {
@@ -139,7 +139,7 @@ func (b *client) doAuth() error {
 	result := authenticateResponse{}
 	response := Response{Result: &result}
 	delete(b.headers, "Authorization")
-	_, err = b.transport.Invoke(authenticateMethod, b.headers, req, &response)
+	_, err = b.transport.Invoke(b.uri(authenticateMethod), b.headers, req, &response)
 	if err != nil {
 		return err
 	}
@@ -150,4 +150,8 @@ func (b *client) doAuth() error {
 	b.authenticated = true
 	b.headers["Authorization"] = "Bearer " + result.Token
 	return nil
+}
+
+func (b *client) uri(method string) string {
+	return b.cfg.Address + method
 }
