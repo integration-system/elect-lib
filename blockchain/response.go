@@ -4,7 +4,7 @@ import "fmt"
 
 type BchError struct {
 	Code    int
-	Details []interface{}
+	Details interface{}
 	Message string
 }
 
