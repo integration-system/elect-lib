@@ -2,7 +2,7 @@ package blockchain
 
 import (
 	"fmt"
-	"github.com/integration-system/elect-lib/blockchain/internal"
+	"github.com/integration-system/elect-lib/blockchain/transport"
 	"github.com/json-iterator/go"
 	"github.com/valyala/fasthttp"
 	"sync"
@@ -24,19 +24,23 @@ type Client interface {
 }
 
 type client struct {
-	transport     internal.Transport
+	transport     transport.Transport
 	cfg           BchConfig
 	headers       map[string]string
 	authenticated bool
 	mx            sync.RWMutex
 }
 
-func NewClient(config BchConfig) Client {
-	return &client{
+func NewClient(config BchConfig, opts ...Option) Client {
+	c := &client{
 		cfg:       config,
 		headers:   map[string]string{"Content-Type": "application/json"},
-		transport: internal.NewHttpTransport(),
+		transport: transport.NewFastHttpTransport(),
 	}
+	for _, opt := range opts {
+		opt(c)
+	}
+	return c
 }
 
 func (b *client) RegisterVotersList(req RegisterVoterListRequest) (*RegisterVotersListResponse, error) {

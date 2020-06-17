@@ -1,4 +1,4 @@
-package internal
+package transport
 
 import (
 	"github.com/json-iterator/go"
@@ -49,9 +49,12 @@ func (b *httpTransport) Invoke(uri string, headers map[string]string, request []
 	return statusCode, nil
 }
 
-func NewHttpTransport() Transport {
+func NewFastHttpTransport(opts ...Option) Transport {
 	cli := &httpTransport{
 		cli: &fasthttp.Client{},
+	}
+	for _, opt := range opts {
+		opt(cli)
 	}
 	return cli
 }
