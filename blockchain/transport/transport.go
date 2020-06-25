@@ -15,7 +15,8 @@ type Transport interface {
 }
 
 type httpTransport struct {
-	cli *fasthttp.Client
+	cli     *fasthttp.Client
+	timeout time.Duration
 }
 
 func (b *httpTransport) Invoke(uri string, headers map[string]string, request []byte, respPtr interface{}) (int, error) {
@@ -34,7 +35,7 @@ func (b *httpTransport) Invoke(uri string, headers map[string]string, request []
 		req.SetBody(request)
 	}
 
-	err := b.cli.DoTimeout(req, res, time.Second*15)
+	err := b.cli.DoTimeout(req, res, b.timeout)
 	if err != nil {
 		return 0, err
 	}
@@ -51,7 +52,8 @@ func (b *httpTransport) Invoke(uri string, headers map[string]string, request []
 
 func NewFastHttpTransport(opts ...Option) Transport {
 	cli := &httpTransport{
-		cli: &fasthttp.Client{},
+		cli:     &fasthttp.Client{},
+		timeout: 15 * time.Second,
 	}
 	for _, opt := range opts {
 		opt(cli)
